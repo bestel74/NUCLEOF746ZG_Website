@@ -75,6 +75,7 @@ static void http_server_serve(struct netconn *conn)
   char* buf;
   u16_t buflen;
   struct fs_file file;
+  char *str_file;
   
   /* Read the data from the port, blocking if nothing yet there. 
    We assume the request (the part we care about) is in one netbuf */
@@ -90,13 +91,27 @@ static void http_server_serve(struct netconn *conn)
       there are other formats for GET, and we're keeping it very simple )*/
       if ((buflen >=5) && (strncmp(buf, "GET /", 5) == 0))
       {
-        char *str_file = strtok(&buf[4], " ");
-        if(fs_open(&file, str_file) == ERR_OK)
+        // Take the filename without 'GET '
+        str_file = strtok(&buf[4], " ");
+
+        // index redirection
+        if(strlen(str_file) == 1)
         {
-          netconn_write(conn, (const unsigned char*)(file.data), (size_t)file.len, NETCONN_NOCOPY);
-          fs_close(&file);
+          str_file = "/index.html";
         }
-      }      
+      }
+
+      // Open and send the file asked by the GET HTTP command
+      if(fs_open(&file, str_file) == ERR_OK)
+      {
+        netconn_write(conn, (const unsigned char*)(file.data), (size_t)file.len, NETCONN_NOCOPY);
+        fs_close(&file);
+      }
+      else
+      {
+        // File not found - check makefsdata and custom_fsdata.c
+      }
+
     }
   }
   /* Close the connection (server closes in HTTP) */

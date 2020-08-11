@@ -75,10 +75,8 @@ a lot of data that needs to be copied, this should be set high. */
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
 #define MEMP_NUM_TCP_PCB_LISTEN 100
-
-
+/* MEMP_NUM_NETCONN: the number of struct netconns.*/
 #define MEMP_NUM_NETCONN  100
-
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
 #define MEMP_NUM_TCP_SEG        8
